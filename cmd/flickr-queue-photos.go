@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"github.com/aaronland/go-flickr-archive/flickr"
-	"github.com/sfomuseum/go-sfomuseum-flickr/aws"
 	"github.com/sfomuseum/go-sfomuseum-flickr/queue"
 	"github.com/sfomuseum/go-sfomuseum-flickr/storage"
 	"github.com/whosonfirst/go-whosonfirst-cli/flags"
+	"github.com/whosonfirst/go-whosonfirst-aws/sqs"	
 	"log"
 	"net/url"
 )
@@ -30,7 +30,7 @@ func main() {
 
 	flag.Parse()
 
-	svc, sqs_queue, err := aws.NewSQSServiceFromString(*sqs_dsn)
+	svc, sqs_queue, err := sqs.NewSQSServiceWithDSN(*sqs_dsn)
 
 	if err != nil {
 		log.Fatal(err)

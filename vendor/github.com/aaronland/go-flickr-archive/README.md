@@ -1,5 +1,8 @@
 # go-flickr-archive
 
-Don't try to use this yet. It is still a moving target.
+This is work in progress. It is not documented yet and should be considered experimental.
 
+## See also
+
+* https://github.com/aaronland/go-storage
 

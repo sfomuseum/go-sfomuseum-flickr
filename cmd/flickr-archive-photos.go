@@ -12,10 +12,10 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/sqs"
+	aws_sqs "github.com/aws/aws-sdk-go/service/sqs"
 	sfom_flickr "github.com/sfomuseum/go-sfomuseum-flickr"
-	sfom_aws "github.com/sfomuseum/go-sfomuseum-flickr/aws"
 	sfom_storage "github.com/sfomuseum/go-sfomuseum-flickr/storage"
+	"github.com/whosonfirst/go-whosonfirst-aws/sqs"
 	"github.com/whosonfirst/go-whosonfirst-cli/flags"
 	"log"
 	"os"
@@ -82,7 +82,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	opts.ArchiveRequest = true
 
 	arch, err := archivist.NewStaticArchivist(store, opts)
@@ -95,7 +95,6 @@ func main() {
 
 		// some day we might have a different kind of lambda trigger
 		// today we do not (20181127/thisisaaronland)
-		// handler, err := sfom_aws.SQSLambdaHandler()
 
 		handler := func(ctx context.Context, sqsEvent events.SQSEvent) error {
 
@@ -128,22 +127,22 @@ func main() {
 		}
 
 		lambda.Start(handler)
-		
+
 	} else if *do_sqs {
 
 		// READ from SQS - not SEND to SQS (20181228/thisisaaronland)
-		
+
 		// I don't really understand how the long-polling stuff is supposed
 		// to work and this is mostly here as an exercise and for debugging
 		// (20181127/thisisaaronland)
 
-		svc, sqs_queue, err := sfom_aws.NewSQSServiceFromString(*sqs_dsn)
+		svc, sqs_queue, err := sqs.NewSQSServiceWithDSN(*sqs_dsn)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		params := &sqs.ReceiveMessageInput{
+		params := &aws_sqs.ReceiveMessageInput{
 			QueueUrl:            aws.String(sqs_queue),
 			MaxNumberOfMessages: aws.Int64(1),
 			VisibilityTimeout:   aws.Int64(30),
@@ -171,7 +170,7 @@ func main() {
 				continue
 			}
 
-			delete_params := &sqs.DeleteMessageInput{
+			delete_params := &aws_sqs.DeleteMessageInput{
 				QueueUrl:      aws.String(sqs_queue),
 				ReceiptHandle: msg.ReceiptHandle,
 			}

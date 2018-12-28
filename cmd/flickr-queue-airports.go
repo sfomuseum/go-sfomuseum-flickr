@@ -4,10 +4,10 @@ import (
 	"context"
 	"flag"
 	"github.com/aaronland/go-flickr-archive/flickr"
-	"github.com/sfomuseum/go-sfomuseum-flickr/aws"
 	"github.com/sfomuseum/go-sfomuseum-flickr/queue"
 	"github.com/sfomuseum/go-sfomuseum-flickr/storage"
 	"github.com/sfomuseum/go-sfomuseum-geojson/properties/sfomuseum"
+	"github.com/whosonfirst/go-whosonfirst-aws/sqs"
 	"github.com/whosonfirst/go-whosonfirst-geojson-v2/feature"
 	"github.com/whosonfirst/go-whosonfirst-geojson-v2/properties/whosonfirst"
 	"github.com/whosonfirst/go-whosonfirst-index"
@@ -33,7 +33,7 @@ func main() {
 
 	flag.Parse()
 
-	svc, sqs_queue, err := aws.NewSQSServiceFromString(*sqs_dsn)
+	svc, sqs_queue, err := sqs.NewSQSServiceWithDSN(*sqs_dsn)
 
 	if err != nil {
 		log.Fatal(err)

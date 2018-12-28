@@ -10,7 +10,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/aaronland/go-string/dsn"	
+	"github.com/aaronland/go-string/dsn"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	aws_session "github.com/aws/aws-sdk-go/aws/session"
@@ -52,6 +52,7 @@ type S3ListOptions struct {
 	Strict  bool
 	Timings bool
 	MaxKeys int64
+	Path    string
 	// Logger log.Logger
 }
 
@@ -108,8 +109,8 @@ func NewS3ConfigFromString(str_dsn string) (*S3Config, error) {
 
 	bucket, _ := dsn_map["bucket"]
 	region, _ := dsn_map["region"]
-	credentials, _ := dsn_map["credentials"]	
-	
+	credentials, _ := dsn_map["credentials"]
+
 	config := S3Config{
 		Bucket:      bucket,
 		Region:      region,
@@ -121,7 +122,7 @@ func NewS3ConfigFromString(str_dsn string) (*S3Config, error) {
 	if ok {
 		config.Prefix = prefix
 	}
-	
+
 	return &config, nil
 }
 
@@ -312,6 +313,30 @@ func (conn *S3Connection) Delete(key string) error {
 	return nil
 }
 
+func (conn *S3Connection) DeleteRecursive(path string) error {
+
+	opts := DefaultS3ListOptions()
+	// opts.Timings = *timings
+	opts.Path = path
+
+	cb := func(obj *S3Object) error {
+
+		if obj.Key == path {
+			return nil
+		}
+
+		return conn.DeleteRecursive(obj.Key)
+	}
+
+	err := conn.List(cb, opts)
+
+	if err != nil {
+		return err
+	}
+
+	return conn.Delete(path)
+}
+
 func (conn *S3Connection) SetACLForBucket(acl string, opts *S3ListOptions) error {
 
 	cb := func(obj *S3Object) error {
@@ -375,9 +400,15 @@ func (conn *S3Connection) List(cb S3ListCallback, opts *S3ListOptions) error {
 		}()
 	}
 
+	prefix := conn.prefix
+
+	if opts.Path != "" {
+		prefix = filepath.Join(prefix, opts.Path)
+	}
+
 	params := &s3.ListObjectsInput{
 		Bucket:  aws.String(conn.bucket),
-		Prefix:  aws.String(conn.prefix),
+		Prefix:  aws.String(prefix),
 		MaxKeys: aws.Int64(opts.MaxKeys),
 		// Delimiter: "baz",
 	}

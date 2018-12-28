@@ -49,7 +49,7 @@ $> ./bin/flickr-archive-photos -api-key {FLICKR_APIKEY} -storage-dsn 'storage=s3
 Or the same thing but archiving things locally to the current directory (`.`):
 
 ```
-$> ./bin/flickr-archive-photos -api-key {FLICKR_API} -depicts 1234 -storage-dsn 'storage=fs root=.' 34607346293
+$> ./bin/flickr-archive-photos -api-key {FLICKR_APIKEY} -depicts 1234 -storage-dsn 'storage=fs root=.' 34607346293
 
 # time passes...
 
@@ -62,6 +62,30 @@ total 3528
 $> cat 34607346293/34607346293_r.json
 {"id":34607346293,"depicts":[1234]}
 ```
+
+Currently the (`go-flickr-archive`) code will archive the response value of a call to the `flickr.photos.getInfo` API method as well as the largest photo is that is publicly available.
+
+The `{PHOTO_ID}_r.json` file contains metadata specific to that particular archiving request. It is left up to consumers to determine its use and function.
+
+## Lambda
+
+Yes. If you run the handy `make lambda-archive` Makefile target then a `archive.zip` binary will be created (derived from the `flickr-archive-photos.go` tool) that you can upload and run as a Lambda function.
+
+As of this writing the Lambda function is hard-wired to receive SQS messages containing JSON-encoded `SFOMuseumFlickrPhoto` documents:
+
+```
+type SFOMuseumFlickrPhoto struct {
+	photo.Photo `json:",omitempty"`
+	ID          int64   `json:"id"`
+	Depicts     []int64 `json:"depicts"`
+}
+```
+
+Which should look familiar since it's basically the same as the `34607346293/34607346293_r.json` file above.
+
+When configuring your Lambda function be sure the add a `SFOMUSEUM_FLICKR_LAMBDA` environment variable whose value is `true`.
+
+It is expected that some or all of the Lambda-related stuff (code, environment variables, etc.) _will_ change in time.
 
 ## To do still
 

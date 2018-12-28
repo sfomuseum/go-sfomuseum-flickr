@@ -18,7 +18,7 @@ This should still be considered experimental. It is not well documented yet nor 
 
 It is provided as-is in the spirit of sharing and maybe serving as a point of reference for others. 
 
-For a generic (and equally experiemental) Flickr archiving tool there is the [go-flickr-archive](https://github.com/aaronland/go-flickr-archive) which this package uses.
+For a generic (and equally experiemental) Flickr archiving tool there is the [go-flickr-archive](https://github.com/aaronland/go-flickr-archive) package which this package uses.
 
 ## Tools
 

@@ -24,7 +24,7 @@ For a generic (and equally experiemental) Flickr archiving tool there is the [go
 
 ### flickr-queue-photos
 
-Put one or more photo IDs in a (SQS) queue for processing. Eventually this code will be wrapped by something that collects all the photos for a given airport (WOE ID).
+Put one or more photo IDs in a (SQS) queue for processing.
 
 ```
 $> ./bin/flickr-queue-photos -storage-dsn 'storage=s3 bucket={S3_BUCKET} prefix={S3_PREFIX} region={S3_REGION} credentials={S3_CREDENTIALS}' -sqs-dsn 'queue={SQS_QUEUE} credentials={SQS_CREDENTIALS} region={SQS_REGION}' -depicts 102535681 37340024961
@@ -32,7 +32,7 @@ $> ./bin/flickr-queue-photos -storage-dsn 'storage=s3 bucket={S3_BUCKET} prefix=
 Success c1e60e95-bc01-4fae-b11b-b976f4844da2
 ```
 
-Queue-ing photos from a `flickr.photos.search` API query:
+Queue-ing photos from a `flickr.photos.search` API query, specificall for photos whose WOE ID is `22411879`:
 
 ```
 $> ./bin/flickr-queue-photos -storage-dsn 'storage=s3 bucket={S3_BUCKET} prefix={S3_PREFIX} region={S3_REGION} credentials={S3_CREDENTIALS}' -sqs-dsn 'region={SQS_REGION} credentials={SQS_CREDENTIALS} queue={SQS_QUEUE}' -search -api-key {FLICKR_APIKEY} -param woe_id=22411879 -param per_page=100 -depicts 102545733
@@ -40,7 +40,7 @@ $> ./bin/flickr-queue-photos -storage-dsn 'storage=s3 bucket={S3_BUCKET} prefix=
 
 ### flickr-archive-photos
 
-Archive one or more photo IDs where "archive" means fetch the largest available photo and the output of the `flickr.photos.getInfo` API method and put them in a place for later processing. Normally this is expected to be run as a Lambda function connected to an SQS queue.
+Archive one or more photo IDs where "archive" means fetch the largest available photo and the output of the `flickr.photos.getInfo` API method and put them in a place for later processing. Normally this is expected to be run as a Lambda function connected to an SQS queue (see below).
 
 ```
 $> ./bin/flickr-archive-photos -api-key {FLICKR_APIKEY} -storage-dsn 'storage=s3 bucket={S3_BUCKET} prefix={S3_PREFIX} region={S3_REGION} credentials={S3_CREDENTIALS}' 17834003703

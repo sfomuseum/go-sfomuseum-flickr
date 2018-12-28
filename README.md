@@ -69,9 +69,11 @@ The `{PHOTO_ID}_r.json` file contains metadata specific to that particular archi
 
 ## Lambda
 
-Yes. If you run the handy `make lambda-archive` Makefile target then a `archive.zip` binary will be created (derived from the `flickr-archive-photos.go` tool) that you can upload and run as a Lambda function.
+Yes.
 
-As of this writing the Lambda function is hard-wired to receive SQS messages containing JSON-encoded `SFOMuseumFlickrPhoto` documents:
+If you run the handy `make lambda-archive` Makefile target then a `archive.zip` binary will be created (derived from the `flickr-archive-photos.go` tool) that you can upload and run as a Lambda function.
+
+As of this writing the Lambda function is hard-wired to receive SQS messages containing JSON-encoded `SFOMuseumFlickrPhoto` documents, typically sent by the `flickr-queue-photos` tool. For example:
 
 ```
 type SFOMuseumFlickrPhoto struct {
@@ -85,7 +87,7 @@ Which should look familiar since it's basically the same as the `34607346293/346
 
 When configuring your Lambda function be sure the add a `SFOMUSEUM_FLICKR_LAMBDA` environment variable whose value is `true`.
 
-It is expected that some or all of the Lambda-related stuff (code, environment variables, etc.) _will_ change in time.
+It is expected that some or all of the Lambda-related stuff (code, input values, environment variables, etc.) _will_ change in time. This is how it works, today.
 
 ## To do still
 
